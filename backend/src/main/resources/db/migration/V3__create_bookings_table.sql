@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS bookings (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    citizen_id BIGINT NOT NULL,
+    ambulance_id BIGINT NULL,
+    pickup_latitude DECIMAL(10, 8) NOT NULL,
+    pickup_longitude DECIMAL(11, 8) NOT NULL,
+    destination_latitude DECIMAL(10, 8),
+    destination_longitude DECIMAL(11, 8),
+    status ENUM('REQUESTED', 'ASSIGNED', 'EN_ROUTE', 'ARRIVED', 'COMPLETED', 'CANCELLED') NOT NULL DEFAULT 'REQUESTED',
+    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    assigned_at TIMESTAMP NULL,
+    completed_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (citizen_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (ambulance_id) REFERENCES ambulances(id) ON DELETE SET NULL,
+    INDEX idx_citizen_id (citizen_id),
+    INDEX idx_ambulance_id (ambulance_id),
+    INDEX idx_status (status),
+    INDEX idx_requested_at (requested_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
