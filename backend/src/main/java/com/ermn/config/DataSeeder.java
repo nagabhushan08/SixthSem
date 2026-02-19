@@ -41,21 +41,21 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        if (userRepository.count() == 0) {
-            seedData();
-        }
+        seedData();
     }
 
     private void seedData() {
         // 1. Seed Super Admin
-        User admin = User.builder()
-                .fullName("Super Admin")
-                .email("admin@ermn.com")
-                .passwordHash(passwordEncoder.encode("admin123"))
-                .phone("0000000000")
-                .role(Role.SUPER_ADMIN)
-                .build();
-        userRepository.save(admin);
+        if (userRepository.findByEmail("admin@ermn.com").isEmpty()) {
+            User admin = User.builder()
+                    .fullName("Super Admin")
+                    .email("admin@ermn.com")
+                    .passwordHash(passwordEncoder.encode("admin123"))
+                    .phone("0000000000")
+                    .role(Role.SUPER_ADMIN)
+                    .build();
+            userRepository.save(admin);
+        }
 
         // 2. Seed Hospitals
         seedHospital("City General Hospital", "MG Road, Bangalore", "12.9716", "77.5946", "hospital1@ermn.com");
@@ -73,6 +73,10 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedHospital(String name, String address, String lat, String lon, String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            return;
+        }
+
         User hospitalAdmin = User.builder()
                 .fullName(name + " Admin")
                 .email(email)
@@ -105,6 +109,10 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedAmbulance(String vehicleNumber, String lat, String lon, String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            return;
+        }
+
         User driver = User.builder()
                 .fullName("Driver " + vehicleNumber)
                 .email(email)
@@ -126,6 +134,10 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedBloodBank(String name, String address, String lat, String lon, String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            return;
+        }
+
         User bloodBankAdmin = User.builder()
                 .fullName(name + " Admin")
                 .email(email)

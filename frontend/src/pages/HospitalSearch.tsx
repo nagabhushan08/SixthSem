@@ -13,7 +13,7 @@ import {
   Grid,
   Paper,
 } from '@mui/material';
-import { ArrowBack, Directions } from '@mui/icons-material';
+import { ArrowBack, Directions, Navigation, MyLocation } from '@mui/icons-material';
 import api from '../services/api';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -100,6 +100,17 @@ const HospitalSearch = () => {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [selectedDestination, setSelectedDestination] = useState<[number, number] | null>(null);
 
+  const handleNavigate = (lat: number, lon: number) => {
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
+  };
+
+  const handleSelectNearest = () => {
+    if (hospitals.length > 0) {
+      const nearest = hospitals[0];
+      setSelectedDestination([nearest.latitude, nearest.longitude]);
+    }
+  };
+
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -145,9 +156,20 @@ const HospitalSearch = () => {
         <Grid container spacing={3}>
           {/* List Section */}
           <Grid item xs={12} md={4}>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-              Nearby Hospitals
-            </Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                Nearby Hospitals
+              </Typography>
+              <Button 
+                variant="outlined" 
+                size="small" 
+                startIcon={<MyLocation />}
+                onClick={handleSelectNearest}
+                disabled={hospitals.length === 0}
+              >
+                Find Nearest
+              </Button>
+            </Box>
             {loading ? (
               <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                 <CircularProgress />
@@ -187,14 +209,24 @@ const HospitalSearch = () => {
                           </Typography>
                         ))}
                       </Box>
-                      <Button 
-                        variant="contained" 
-                        fullWidth 
-                        startIcon={<Directions />}
-                        onClick={() => setSelectedDestination([hospital.latitude, hospital.longitude])}
-                      >
-                        Show Path
-                      </Button>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button 
+                          variant="contained" 
+                          fullWidth 
+                          startIcon={<Directions />}
+                          onClick={() => setSelectedDestination([hospital.latitude, hospital.longitude])}
+                          sx={{ flexGrow: 1 }}
+                        >
+                          Show Path
+                        </Button>
+                        <Button 
+                          variant="outlined"
+                          startIcon={<Navigation />}
+                          onClick={() => handleNavigate(hospital.latitude, hospital.longitude)}
+                        >
+                          Navigate
+                        </Button>
+                      </Box>
                     </CardContent>
                   </Card>
                 ))}
